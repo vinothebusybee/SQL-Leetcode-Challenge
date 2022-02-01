@@ -35,3 +35,31 @@
 -- Solution
 select row_number() over (order by (if(id%2=1,id+1,id-1))) as id, student
 from seat
+
+
+%python
+data = [
+        [1, "Abbot"], 
+        [2, "Doris"], 
+        [3, "Emerson"], 
+        [4, "Green"], 
+        [5, "Jeames"],
+    #[6, "xxxxx"]
+       ]
+		
+columns = ["id", "student"]
+
+df = spark.createDataFrame(data, columns)
+
+df.createOrReplaceTempView("tbl")
+
+
+%sql
+select id, student,
+case 
+when id = mxid and mod(mxid,2)=1 then id
+when mod(id,2)=1 then id+1
+when mod(id,2)=0 then id-1 end as new_seat
+from tbl, (select max(id) mxid from tbl)
+
+
