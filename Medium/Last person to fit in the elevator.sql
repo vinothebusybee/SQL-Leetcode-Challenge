@@ -54,3 +54,30 @@ select t1.person_name
 from t1
 where turn = (select max(turn) from t1 where t1.cum_weight<=1000)
 
+
+%python
+data = [
+        [5, "George Washington", 250, 1], 
+        [3, "John Adams", 350, 2], 
+        [6, "Thomas Jefferson", 400, 3], 
+        [2, "Will Johnliams", 200, 4], 
+        [4, "Thomas Jefferson", 175, 5], 
+        [1, "James Elephant", 500, 6], 
+       ]
+		
+columns = ["person_id", "person_name", "weight", "turn"]
+
+df = spark.createDataFrame(data, columns)
+
+df.createOrReplaceTempView("tbl")
+
+
+%sql
+
+select person_name from(
+select *, sum(weight) over(order by turn) cum_weight from tbl
+) where cum_weight <=1000 order by cum_weight desc limit 1
+
+
+
+
