@@ -53,3 +53,27 @@ group by country, month(trans_date))
 select t1.month, t1.country, coalesce(t1.trans_count,0) as trans_count, coalesce(t2.approved_count,0) as approved_count, coalesce(t1.trans_total_amount,0) as trans_total_amount, coalesce(t2.approved_total_amount,0) as approved_total_amount
 from t1 left join t2
 on t1.country = t2.country and t1.month = t2.month
+
+
+
+%python
+data = [
+        [121, "US", "approved", "1000", "2018-12-18"], 
+        [122, "US", "declined", "2000", "2018-12-19"],
+        [123, "US", "approved", "2000", "2019-01-01"],
+        [124, "DE", "approved", "2000", "2019-01-07"]
+       ]
+		
+columns = ["id", "country", "state", "amount", "trans_date"]
+
+df = spark.createDataFrame(data, columns)
+
+df.createOrReplaceTempView("tbl")
+
+%sql
+select substr(trans_date,0,7) month, country, count(*) as trans_count,
+count(case when state = 'approved' then 1 end) as approved_count,
+sum(amount) trans_total_amount,
+sum(case when state = 'approved' then amount else 0 end) approved_total_amount
+from tbl
+group by substr(trans_date,0,7), country
