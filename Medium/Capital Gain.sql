@@ -66,3 +66,34 @@ where operation = 'Buy'
 group by stock_name) c
 on b.stock_name = c.name)
 order by capital_gain_loss desc
+
+%python
+data = [
+        ["Leetcode", "Buy", 1, 1000], 
+        ["Corona Masks", "Buy", 2, 10],
+        ["Leetcode", "Sell", 5, 9000],
+        ["Handbags", "Buy", 17, 30000],
+        ["Corona Masks", "Sell", 3, 1010],
+        ["Corona Masks", "Buy", 4, 1000], 
+        ["Corona Masks", "Sell", 5, 500],
+        ["Corona Masks", "Buy", 6, 1000],
+        ["Handbags", "Sell", 29, 7000],
+        ["Corona Masks", "Sell", 10, 10000]
+       ]
+		
+columns = ["stock_name", "operation", "operation_day", "price"]
+
+df = spark.createDataFrame(data, columns)
+
+df.createOrReplaceTempView("tbl")
+
+
+%sql
+
+select buy.stock_name, sell.sum_price-buy.sum_price capital_gain_loss
+from
+(select stock_name, sum(price) sum_price from tbl where operation='Buy' group by stock_name) buy
+left join
+(select stock_name, sum(price) sum_price from tbl where operation='Sell' group by stock_name) sell
+on buy.stock_name = sell.stock_name
+
