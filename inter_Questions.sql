@@ -36,6 +36,7 @@ max(case when SubjectId = 1 then Marks else 0 end) as SubjectId1,
 max(case when SubjectId = 2 then Marks else 0 end) as SubjectId2,
 max(case when SubjectId = 3 then Marks else 0 end) as SubjectId3,
 max(case when SubjectId = 4 then Marks else 0 end) as SubjectId4,
+sum(Marks) as TotalMarks,
 case when min(Marks) < 40 or count (distinct SubjectId)< 4 then 'Fail' else 'Pass' end as Result
 from tbl group by studentId
 
