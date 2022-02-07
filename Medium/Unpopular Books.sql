@@ -73,3 +73,8 @@ where dispatch_date > '2018-06-23') a
 on a.book_id = b.book_id
 group by b.book_id, name
 having coalesce(sum(quantity),0)<10
+
+
+https://dsfaisal.com/articles/2020-11-06-leetcode-sql-problem-solving/#1098-unpopular-books--medium---leetcode
+
+
