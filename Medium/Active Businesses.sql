@@ -51,3 +51,29 @@ on e.event_type = b.event) c
 where c.occurences>c.average
 group by c.business_id
 having count(*) > 1
+
+
+%python
+data = [
+        [1, "reviews", 7], 
+        [3, "reviews", 3], 
+        [1, "ads", 11], 
+        [2, "ads", 7], 
+        [3, "ads", 6], 
+        [1, "page views", 3],
+        [2, "page views", 12]
+       ]
+		
+columns = ["business_id", "event_type", "occurences"]
+
+df = spark.createDataFrame(data, columns)
+
+df.createOrReplaceTempView("tbl")
+
+%sql
+select business_id from
+(select business_id,event_type, occurences, avg(occurences) over(partition by event_type) avg from tbl) 
+where occurences>avg
+group by business_id
+having count(*)>1
+
